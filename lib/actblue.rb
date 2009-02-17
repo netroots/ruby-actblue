@@ -107,4 +107,4 @@ module ActBlue
   
 end
 
-Dir["#{File.dirname(__FILE__)}/actblue4r/*.rb"].each { |source_file| require source_file }
+Dir["#{File.dirname(__FILE__)}/actblue/*.rb"].each { |source_file| require source_file }
