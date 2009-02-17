@@ -4,10 +4,14 @@ module ActBlue
     
     XML_NAME = 'contribution'
     ATTRIBUTES = ['order-number', 'created-on']
-    ELEMENTS = ['refcode', 'source', 'timestamp', 'submitter', 'recurring', 'recurringtimes', 'referrer', 'successuri', 'lineitems']
+    ELEMENTS = ['page', 'refcode', 'source', 'timestamp', 'submitter', 'recurring', 'recurringtimes', 'referrer', 'successuri', 'lineitems']
 
     def self.get(params)
       hash = ActiveBlue.get('/contributions', :query => params)
+      unless hash
+        return nil
+      end
+      return hash["contributions"] if ((params["view"] == "summary") || (params[:view] == "summary"))
       result = []
       if hash["contributions"]
         hash["contributions"]["contribution"].each do |h|
