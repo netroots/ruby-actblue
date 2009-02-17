@@ -7,16 +7,16 @@ module ActBlue
     ELEMENTS =    ['title', 'author', 'blurb', 'visibility', 'showcandidatesummary', 'listentries']
     
     def post
-      super.post('/pages', :body => to_xml)
+      ActiveBlue.post('/pages', :body => to_xml)
     end
     
     def put
-      super.put("/pages/#{@variables['name']}", :body => to_xml) if @variables['name']
+      ActiveBlue.put("/pages/#{@variables['name']}", :body => to_xml) if @variables['name']
     end
     
     def delete
       @variables['visibility'] = "archived"
-      super.put("/pages/#{@variables['name']}", :body => to_xml) if @variables['name']
+      ActiveBlue.put("/pages/#{@variables['name']}", :body => to_xml) if @variables['name']
     end
     
   end
