@@ -47,22 +47,4 @@ describe ActBlue::Page do
     end
   end
   
-  describe "#get" do
-    it "should find and marshall a contribution" do
-      ActBlue::ActiveBlue.should_receive(:get).and_return({"page" => {"title" => "test"}})
-      
-      pages = ActBlue::Page.get(:title => "test")
-      pages.first["title"].should eql "test"
-    end
-    
-    it "should find and marshall 2 pages" do
-      ActBlue::ActiveBlue.should_receive(:get).and_return({"pages" => [{"title" => "one", "author" => "joe"},{"title" => "two", "author" => "joe"}]})
-      
-      pages = ActBlue::Page.get(:author => "joe")
-      pages.size.should eql 2
-      pages[0]["title"].should eql "one"
-      pages[1]["title"].should eql "two"
-    end
-  end
-  
 end

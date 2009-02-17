@@ -11,7 +11,12 @@ module ActBlue
     end
     
     def put
-      super.put('/pages', :body => to_xml)
+      super.put("/pages/#{@variables['name']}", :body => to_xml) if @variables['name']
+    end
+    
+    def delete
+      @variables['visibility'] = "archived"
+      super.put("/pages/#{@variables['name']}", :body => to_xml) if @variables['name']
     end
     
   end
