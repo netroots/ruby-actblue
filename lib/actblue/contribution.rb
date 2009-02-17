@@ -22,14 +22,6 @@ module ActBlue
       end
       result
     end
-    
-    def post
-      super.post('/contributions', :body => to_xml)
-    end
-    
-    def put
-      super.put('/contributions', :body => to_xml)
-    end
 
   end
   
