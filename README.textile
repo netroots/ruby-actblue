@@ -1,0 +1,112 @@
+The *ruby-actblue* gem is an object mapping for the ActBlue API.
+
+Two environment variables need to be set before use: ACTBLUE_USER and ACTBLUE_PASS.  This username password combo are the same email/password credentials you would use to log into secure.actblue.com.
+
+<pre>
+ENV['ACTBLUE_USER'] = <EMAIL>
+ENV['ACTBLUE_PASS'] = <PASSWORD>
+</pre>
+
+h1. Terms
+
+A *Contribution* represents a donation from a given source to a given destination.
+
+A *Page* represents a fundraising campaign.  A Page also literally translates to an explicit url on actblue.com.  Pages can have one or many candidates or entities associated with them.
+
+h1. Capabilities
+
+The ActBlue API is somewhat restricted compared to its base Indigo documentation.  The Ruby wrapper acknowledges this reality and only exposes what you _can_ do.
+
+You can:
+
+* Get Contributions for a given entity (candidate)
+* Create new Pages
+* Update Pages
+* Delete Pages
+
+Note that you _cannot_ post Contributions through the ActBlue API.  We will be sending people directly to actblue.com to make contributions.
+
+h1. Library
+
+h2. Creating Objects
+
+This library has a specific way to build and read API objects.  Each class can take parameters for API variables in the constructor.  All variables for an API object can be later read/written to by using the [] operator.  For example:
+
+<pre>
+# Create a new Page object
+@p = Page.new("title" => "My New Campaign")
+
+...
+
+# Modify the title later
+@p["title"] => "My Awesome Campaign"
+
+# Look at all the variables
+@p.variables.inspect
+=> {"title" => "My Awesome Campaign"}
+</pre>
+
+Each API object has 3 constants defined: XML_NAME, ATTRIBUTES and ELEMENTS.  The ATTRIBUTES and ELEMENTS reveal the possible variables you can pass into the constructor and modify per the example above.  The XML_NAME is used for serializing an API object to XML for delivery back to ActBlue.
+
+The reason a variable hash is exposed with the [] operator and variables are not simply getter/setter instance methods is due to the fact that the ActBlue API has several attributes and elements that have a '-' dash in their name.
+
+When creating objects with nested elements you should use the corresponding API objects.  For example if I wanted to add some Listentries to the Page object we were working with above:
+
+<pre>
+@p["listentries"] = [ListEntry.new(:blurb => "kyle"), ListEntry.new(:blurb => "another")]
+</pre>
+
+h2. Calling ActBlue
+
+We mentioned above that the API can only really do 4 things at a high level.  As a result you will only be calling ActBlue via the two main API objects: *Contribution* and *Page*.
+
+The goal of the library was to have a complete object mapping both when building and receiving API objects.  The result of every call you make to the ActBlue API will be exactly like the objects you built.
+
+All of the methods on the Page class (post, put, delete) return the actual response from ActBlue which you will have to interpret.  Call .code on the response object to get the HTTP code returned with the call.  You will have to deal with errors and problems within your application. 
+
+h3. Contribution.get
+
+_Contribution.get_ queries ActBlue for Contributions that match your parameters.  The parameters hash can contain any of the variables specified within the Indigo API.  For the most part we'll only need to do a few different kinds of queries.
+
+<pre>
+# Don't do this.  This is actually asking ActBlue for all the contributions ever and it won't work.
+Contribution.get()
+
+# Get all Contributions for Brian Moran.  Notice the destination parameter.  It corresponds to Brian Moran's entity id within the ActBlue system which is 20930.
+@contributions = Contribution.get(:destination=> "20930")
+=> [contribution1, contribution2, ... ]
+
+# Get all Contributions for a given Page.  This wasn't documented in their API docs but it works.  Pass in the page parameter with the page name attribute.
+@page_contributions = Contribution.get(:page => "bmoran")
+=> [contribution1, contribution2, ... ]
+
+# Get a summary of all the Contributions for Brian Moran.  This will just return some stats on all the contributions that match the query.  The count, sum and average are supposed to be part of this summary return.  In practice though I have only seen the count returned.
+@contributions_summary = Contribution.get(:destination => "20930", :view => "summary")
+=> {"count" => "2", "sum" => "100.00"}
+</pre>
+
+h3. Page.post
+
+Create an instance of a Page with all the variables you want.  title, name and author must be set in order to create the page.
+
+<pre>
+@p = Page.new(:title => "my page", :name => "mypage", :author => "Kyle")
+@p.post
+</pre>
+
+h3. Page.put
+
+Using the @p Page instance from above...
+
+<pre>
+@p['title'] = "My Newer Page"
+@p.put
+</pre>
+
+h3. Page.delete
+
+Using the @p Page instance from above.  This simply sets the "visibility" Page variable to "archived" which on ActBlue means deleted.
+
+<pre>
+@p.delete
+</pre>
