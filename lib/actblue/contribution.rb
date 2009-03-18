@@ -18,7 +18,8 @@ module ActBlue
           result << Contribution.new(hash["contributions"]["contribution"])
         else
           hash["contributions"]["contribution"].each do |h|
-            result << Contribution.new(h)
+              result << Contribution.new(h)
+          end
         end
       elsif hash["contribution"]
         result << Contribution.new(hash["contribution"])
