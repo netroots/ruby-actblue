@@ -13,8 +13,11 @@ module ActBlue
       end
       return hash["contributions"] if ((params["view"] == "summary") || (params[:view] == "summary"))
       result = []
-      if hash["contributions"]
-        hash["contributions"]["contribution"].each do |h|
+      if hash["contributions"] && hash["contributions"]["contribution"]
+        if hash["contributions"]["contribution"].is_a?(Hash)
+          result << Contribution.new(hash["contributions"]["contribution"])
+        else
+          hash["contributions"]["contribution"].each do |h|
             result << Contribution.new(h)
         end
       elsif hash["contribution"]
